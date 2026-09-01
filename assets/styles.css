@@ -453,6 +453,13 @@ article p {
   filter: drop-shadow(0 18px 24px rgba(103, 232, 249, 0.2));
 }
 
+.brain-visual {
+  width: 13rem;
+  min-width: 13rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 38px rgba(139, 92, 246, 0.22);
+}
+
 .pen-cap,
 .pen-body,
 .pen-tip {
@@ -715,6 +722,10 @@ article p {
   }
 
   .pen-visual {
+    align-self: center;
+  }
+
+  .brain-visual {
     align-self: center;
   }
 
