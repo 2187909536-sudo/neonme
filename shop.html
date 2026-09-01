@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>我的小店 · A Small Universe</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <main>
+      <section class="cards-section shop-page">
+        <a class="secondary back-link" href="index.html">← 返回主页</a>
+        <section id="shop" class="shop-module" aria-labelledby="shop-title">
+          <div class="shop-heading">
+            <div>
+              <p class="eyebrow">small shop / sample</p>
+              <h1 id="shop-title" class="shop-title">一支刚好顺手的笔</h1>
+            </div>
+            <span class="price">¥1</span>
+          </div>
+          <div class="product-row">
+            <div class="pen-visual" aria-hidden="true"><div class="pen-cap"></div><div class="pen-body"><span></span></div><div class="pen-tip"></div></div>
+            <div class="product-copy">
+              <p>黑色中性笔</p>
+              <span>轻一点，写下今天的灵感。填写收货信息后提交订单。</span>
+              <form class="order-form" id="order-form">
+                <label>姓名<input name="name" required autocomplete="name" placeholder="怎么称呼你" /></label>
+                <label>手机<input name="phone" required inputmode="tel" autocomplete="tel" placeholder="用于联系发货" /></label>
+                <label class="full">收货地址<textarea name="address" required autocomplete="street-address" rows="2" placeholder="省 / 市 / 区，详细地址"></textarea></label>
+                <button class="pay-button wechat full" type="submit">提交订单并显示微信收款码</button>
+              </form>
+              <div class="order-result" id="order-result" hidden>
+                <p>订单已生成 <strong id="order-id"></strong></p>
+                <img src="assets/wechat-pay.jpg" alt="微信收款二维码" />
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+    <script>
+      document.querySelector("#order-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const data = Object.fromEntries(new FormData(event.currentTarget));
+        const order = { ...data, id: `NM${Date.now().toString().slice(-8)}`, createdAt: new Date().toISOString(), status: "待人工确认" };
+        localStorage.setItem("neonme-last-order", JSON.stringify(order));
+        document.querySelector("#order-id").textContent = order.id;
+        document.querySelector("#order-result").hidden = false;
+        event.currentTarget.hidden = true;
+      });
+    </script>
+  </body>
+</html>
