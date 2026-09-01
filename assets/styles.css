@@ -429,6 +429,11 @@ article p {
   margin-top: 2rem;
 }
 
+.product-copy {
+  width: min(100%, 42rem);
+  margin-top: 2rem;
+}
+
 .product-card {
   position: relative;
   min-height: 15rem;
@@ -436,6 +441,15 @@ article p {
   border-radius: 1.25rem;
   background: rgba(255, 255, 255, 0.06);
   padding: 1.25rem;
+}
+
+.product-card .pen-visual,
+.product-card .brain-visual {
+  display: block;
+  width: min(100%, 13rem);
+  min-width: 0;
+  height: auto;
+  margin: 0 auto;
 }
 
 .product-card h2 { margin-top: 1rem; font-size: 1.2rem; }
