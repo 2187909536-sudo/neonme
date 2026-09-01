@@ -542,7 +542,8 @@ article p {
 }
 
 .order-form input,
-.order-form textarea {
+.order-form textarea,
+.order-form select {
   display: block;
   width: 100%;
   margin-top: 0.35rem;
@@ -553,6 +554,11 @@ article p {
   color: #fff;
   font: inherit;
   outline: none;
+}
+
+.order-form select {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .order-form input:focus,
