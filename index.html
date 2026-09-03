@@ -447,6 +447,142 @@ h1 span {
   line-height: 1.65;
 }
 
+.music-section {
+  display: grid;
+  width: min(calc(100% - 3rem), 80rem);
+  margin: 1.25rem auto 0;
+  grid-template-columns: minmax(0, 0.9fr) minmax(22rem, 1.1fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.music-copy,
+.music-player {
+  min-height: 18rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(240, 171, 252, 0.18), transparent 14rem),
+    rgba(255, 255, 255, 0.05);
+  padding: clamp(1.35rem, 3vw, 2rem);
+}
+
+.music-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.music-copy h2 {
+  max-width: 34rem;
+  color: #fff;
+  font-size: clamp(2rem, 5vw, 4.4rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.music-copy > span {
+  display: block;
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.music-player {
+  position: relative;
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: 1.5rem;
+  overflow: hidden;
+  align-items: center;
+  background:
+    radial-gradient(circle at 75% 15%, rgba(103, 232, 249, 0.2), transparent 16rem),
+    radial-gradient(circle at 25% 85%, rgba(253, 230, 138, 0.12), transparent 14rem),
+    rgba(255, 255, 255, 0.055);
+}
+
+.music-player::after {
+  position: absolute;
+  right: 1.5rem;
+  top: 1.2rem;
+  content: "01";
+  color: rgba(253, 230, 138, 0.78);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.vinyl {
+  position: relative;
+  display: grid;
+  width: 11rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, #fff 0 0.38rem, transparent 0.42rem),
+    radial-gradient(circle, var(--solar) 0 1.8rem, transparent 1.85rem),
+    conic-gradient(from 30deg, #050510, #39255f, #061a25, #050510, #59204f, #050510);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 0 75px rgba(103, 232, 249, 0.2);
+  animation: spin 16s linear infinite;
+}
+
+.vinyl::before,
+.vinyl::after {
+  position: absolute;
+  content: "";
+  border-radius: 999px;
+}
+
+.vinyl::before {
+  inset: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vinyl::after {
+  inset: 3.1rem;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.78), transparent 0.38rem),
+    linear-gradient(135deg, var(--cyan), var(--fuchsia));
+}
+
+.vinyl i {
+  position: absolute;
+  right: -2rem;
+  top: 1.35rem;
+  width: 4.8rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  transform: rotate(28deg);
+  transform-origin: left center;
+}
+
+.track-info strong {
+  display: block;
+  color: #fff;
+  font-size: clamp(1.45rem, 3vw, 2.35rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.track-info span {
+  display: block;
+  margin-top: 0.45rem;
+  color: rgba(226, 232, 240, 0.68);
+}
+
+.track-info audio {
+  display: block;
+  width: 100%;
+  margin-top: 1.4rem;
+  accent-color: var(--cyan);
+}
+
 .gallery-section {
   width: min(100%, 80rem);
   margin: 0 auto;
@@ -1202,7 +1338,9 @@ article p {
   .mood-strip,
   .gallery-grid,
   .identity-section,
-  .signal-board {
+  .signal-board,
+  .music-section,
+  .music-player {
     grid-template-columns: 1fr;
   }
 
@@ -1307,6 +1445,7 @@ article p {
         </a>
         <nav aria-label="主页导航">
           <a href="#mood">氛围</a>
+          <a href="#music">音乐</a>
           <a href="#gallery">相册</a>
           <a href="#notes">碎片</a>
           <a href="shop.html">小店</a>
@@ -1372,6 +1511,32 @@ article p {
             <span>03</span>
             <strong>小店入口</strong>
             <p>不抢主页存在感，但需要时一眼能找到。</p>
+          </div>
+        </section>
+
+        <section id="music" class="music-section" aria-label="我喜欢的歌">
+          <div class="music-copy">
+            <p class="eyebrow">now playing</p>
+            <h2>放一首最近喜欢的纯音乐。</h2>
+            <span>
+              姜辰辰 / 吉子迈子 - 别让我放不下（纯音乐版）
+            </span>
+          </div>
+          <div class="music-player">
+            <div class="vinyl" aria-hidden="true">
+              <i></i>
+            </div>
+            <div class="track-info">
+              <strong>别让我放不下</strong>
+              <span>纯音乐版</span>
+              <audio
+                controls
+                preload="metadata"
+                src="bie-rang-wo-fang-bu-xia-instrumental.mp3"
+              >
+                你的浏览器不支持音频播放。
+              </audio>
+            </div>
           </div>
         </section>
 
