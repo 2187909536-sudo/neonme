@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>neonme 后台</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body class="admin-body">
+    <main class="admin-shell">
+      <section class="admin-hero">
+        <div>
+          <p class="eyebrow">NEON CONTROL</p>
+          <h1>后台</h1>
+          <span>查看留言、订单、访客和照片点赞。</span>
+        </div>
+        <a class="secondary" href="index.html">返回主页 <span>↗</span></a>
+      </section>
+
+      <section class="admin-login" id="admin-login">
+        <label>
+          后台密码
+          <input id="admin-password" type="password" autocomplete="current-password" placeholder="输入密码" />
+        </label>
+        <button class="primary" id="admin-enter" type="button">进入后台</button>
+        <p id="admin-message">密码只保存在这个浏览器里。</p>
+      </section>
+
+      <section class="admin-panel" id="admin-panel" hidden>
+        <div class="admin-stats">
+          <article>
+            <span>访客</span>
+            <strong id="admin-visits">--</strong>
+            <button type="button" data-action="reset-visits">清零</button>
+          </article>
+          <article>
+            <span>留言</span>
+            <strong id="admin-note-count">--</strong>
+          </article>
+          <article>
+            <span>订单</span>
+            <strong id="admin-order-count">--</strong>
+          </article>
+          <article>
+            <span>点赞项</span>
+            <strong id="admin-like-count">--</strong>
+          </article>
+        </div>
+
+        <div class="admin-grid">
+          <section class="admin-card">
+            <div class="admin-card-head">
+              <h2>留言</h2>
+              <button type="button" data-action="refresh">刷新</button>
+            </div>
+            <div class="admin-list" id="admin-guestbook"></div>
+          </section>
+
+          <section class="admin-card">
+            <div class="admin-card-head">
+              <h2>小店订单</h2>
+              <button type="button" data-action="refresh">刷新</button>
+            </div>
+            <div class="admin-list" id="admin-orders"></div>
+          </section>
+
+          <section class="admin-card admin-card-wide">
+            <div class="admin-card-head">
+              <h2>照片点赞</h2>
+              <button type="button" data-action="refresh">刷新</button>
+            </div>
+            <div class="admin-likes" id="admin-likes"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const ADMIN_API = "https://neonme-api.2187909536-d8f.workers.dev";
+      const passwordInput = document.querySelector("#admin-password");
+      const loginBox = document.querySelector("#admin-login");
+      const panel = document.querySelector("#admin-panel");
+      const message = document.querySelector("#admin-message");
+      const state = {
+        password: localStorage.getItem("neonme-admin-password") || "",
+      };
+
+      passwordInput.value = state.password;
+
+      const requestAdmin = async (path, options = {}) => {
+        const response = await fetch(`${ADMIN_API}${path}`, {
+          headers: {
+            "Content-Type": "application/json",
+            "X-Admin-Password": state.password,
+          },
+          ...options,
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "request failed");
+        return data;
+      };
+
+      const empty = (text) => {
+        const item = document.createElement("p");
+        item.className = "admin-empty";
+        item.textContent = text;
+        return item;
+      };
+
+      const renderList = (target, items, type) => {
+        target.innerHTML = "";
+        if (!items.length) {
+          target.appendChild(empty("还没有内容。"));
+          return;
+        }
+        items.forEach((item) => {
+          const card = document.createElement("article");
+          const title = document.createElement("strong");
+          const meta = document.createElement("span");
+          const text = document.createElement("p");
+          const button = document.createElement("button");
+          title.textContent = type === "orders" ? `${item.product || "订单"} · ${item.name || "未留名"}` : item.name || "visitor";
+          meta.textContent = item.createdAt ? new Date(item.createdAt).toLocaleString("zh-CN") : "";
+          text.textContent = type === "orders"
+            ? `${item.phone || ""} ${item.address || ""}`.trim() || "没有更多信息"
+            : item.message || "";
+          button.type = "button";
+          button.textContent = "删除";
+          button.addEventListener("click", async () => {
+            await requestAdmin(`/admin/${type}/${item.index}`, { method: "DELETE" });
+            await loadAdmin();
+          });
+          card.append(title, meta, text, button);
+          target.appendChild(card);
+        });
+      };
+
+      const renderLikes = (target, likes) => {
+        target.innerHTML = "";
+        if (!likes.length) {
+          target.appendChild(empty("还没有点赞。"));
+          return;
+        }
+        likes.sort((a, b) => a.id.localeCompare(b.id)).forEach((item) => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.textContent = `${item.id} · ${item.count}`;
+          chip.title = "点击清空这张照片的点赞";
+          chip.addEventListener("click", async () => {
+            await requestAdmin(`/admin/likes/${encodeURIComponent(item.id)}`, { method: "DELETE" });
+            await loadAdmin();
+          });
+          target.appendChild(chip);
+        });
+      };
+
+      const loadAdmin = async () => {
+        try {
+          const data = await requestAdmin("/admin/summary");
+          loginBox.hidden = true;
+          panel.hidden = false;
+          message.textContent = "已连接后台。";
+          document.querySelector("#admin-visits").textContent = data.visits;
+          document.querySelector("#admin-note-count").textContent = data.guestbook.length;
+          document.querySelector("#admin-order-count").textContent = data.orders.length;
+          document.querySelector("#admin-like-count").textContent = data.likes.length;
+          renderList(document.querySelector("#admin-guestbook"), data.guestbook, "guestbook");
+          renderList(document.querySelector("#admin-orders"), data.orders, "orders");
+          renderLikes(document.querySelector("#admin-likes"), data.likes);
+        } catch {
+          loginBox.hidden = false;
+          panel.hidden = true;
+          message.textContent = "密码不对，或者后台暂时连不上。";
+        }
+      };
+
+      document.querySelector("#admin-enter").addEventListener("click", () => {
+        state.password = passwordInput.value.trim();
+        localStorage.setItem("neonme-admin-password", state.password);
+        loadAdmin();
+      });
+
+      document.querySelectorAll("[data-action='refresh']").forEach((button) => {
+        button.addEventListener("click", loadAdmin);
+      });
+
+      document.querySelector("[data-action='reset-visits']").addEventListener("click", async () => {
+        await requestAdmin("/admin/visits/reset", { method: "POST" });
+        await loadAdmin();
+      });
+
+      if (state.password) loadAdmin();
+    </script>
+  </body>
+</html>
